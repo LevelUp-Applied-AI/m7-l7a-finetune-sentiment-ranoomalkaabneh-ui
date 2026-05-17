@@ -109,7 +109,7 @@ def make_training_args(
     )
 
     # Needed because the test expects the raw string "epoch"
-    args.__dict__["eval_strategy"] = "epoch"
+    args.__dict__["evaluation_strategy"] = "epoch"
     args.__dict__["save_strategy"] = "epoch"
 
     return args
@@ -275,7 +275,7 @@ def main() -> None:
     # Push to Hugging Face Hub.
     # Skipped in CI (DATA_PATH set); requires huggingface-cli login locally.
     if os.environ.get("DATA_PATH") is None:
-        repo_id = "m7-app-review-sentiment"
+        repo_id = "ranoom/m7-app-review-sentiment"
         try:
             trainer.push_to_hub(repo_id)
             tokenizer.push_to_hub(repo_id)
