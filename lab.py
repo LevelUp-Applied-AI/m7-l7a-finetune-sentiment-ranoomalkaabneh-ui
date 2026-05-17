@@ -137,29 +137,26 @@ def train_classifier(
     tokenizer,
     num_labels: int = 3,
 ) -> Trainer:
-    """
-    Construct and train a Trainer.
 
-    Returns the trained Trainer (trainer.model is the fine-tuned model). Pass
-    id2label=ID2LABEL and label2id=LABEL2ID to the model so its config records
-    the human-readable label names — Integration 7A reads them from
-    model.config.id2label rather than hard-coding.
-    """
-    model =AutoModelForSequenceClassification.from_pretrained(
+    model = AutoModelForSequenceClassification.from_pretrained(
         model_name,
         num_labels=num_labels,
         id2label=ID2LABEL,
         label2id=LABEL2ID
     )
-    data_collator=DataCollatorWithPadding(tokenizer=tokenizer)
-    trainer=Trainer(model=model,
-                    args=training_args,
-                    train_dataset=tokenized_ds["train"],
-                    eval_dataset=tokenized_ds["test"],
-                    tokenizer=tokenizer,
-                    data_collator=data_collator,
-                    compute_metrics=compute_metrics)
-    
+
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=tokenized_ds["train"],
+        eval_dataset=tokenized_ds["test"],
+        tokenizer=tokenizer,
+        data_collator=data_collator,
+        compute_metrics=compute_metrics
+    )
+
     trainer.train()
     return trainer
 
@@ -214,7 +211,7 @@ def evaluate_classifier(trainer: Trainer, tokenized_test) -> dict:
 def main() -> None:
     """Orchestrate the full pipeline."""
     data_path = get_data_path()
-    output_dir = "model"
+    output_dir = "./fixed_model"
     model_name = "distilbert-base-uncased"
 
     ds = prepare_dataset(data_path)
@@ -238,6 +235,7 @@ def main() -> None:
     # Save locally (model/ is gitignored)
     trainer.save_model(output_dir)
     tokenizer.save_pretrained(output_dir)
+    
 
     # Evaluate
     metrics = evaluate_classifier(trainer, tokenized["test"])
@@ -275,7 +273,7 @@ def main() -> None:
     # Push to Hugging Face Hub.
     # Skipped in CI (DATA_PATH set); requires huggingface-cli login locally.
     if os.environ.get("DATA_PATH") is None:
-        repo_id = "ranoom/m7-app-review-sentiment"
+        repo_id = "Raneem5/m7-app-review-sentiment"
         try:
             trainer.push_to_hub(repo_id)
             tokenizer.push_to_hub(repo_id)
