@@ -2,7 +2,8 @@
 # DistilBERT checkpoints are ~265 MB, exceeding GitHub's 100 MB hard limit.
 # The model lives on Hugging Face Hub; do not commit it to the repo.
 model/
-
+fixed_model/
+checkpoint-*/
 # Python
 __pycache__/
 *.pyc
